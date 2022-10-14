@@ -265,8 +265,6 @@ def test_bin_op(dtype_x, dtype_y, op, device='cuda'):
         numpy_expr = f'x.astype(np.float32) {op} y.astype(np.float32)'
     elif op == '%' and dtype_x in ('int16', 'float16', 'bfloat16') and dtype_y in ('int16', 'float16', 'bfloat16'):
         numpy_expr = f'np.fmod(x.astype(np.float32), y.astype(np.float32))'
-    elif op == '%':
-        numpy_expr = f'np.fmod(x, y)'
     elif (dtype_x in uint_dtypes and dtype_y in int_dtypes and _bitwidth(dtype_x) >= _bitwidth(dtype_y)):
         numpy_expr = f'x.astype(np.{dtype_x}) {op} y.astype(np.{dtype_x})'
     elif (dtype_y in uint_dtypes and dtype_x in int_dtypes and _bitwidth(dtype_y) >= _bitwidth(dtype_x)):
@@ -282,6 +280,8 @@ def test_bin_op(dtype_x, dtype_y, op, device='cuda'):
         with pytest.raises(triton.CompilationError) as exc_info:
             _test_binary(dtype_x, dtype_y, expr, numpy_expr, device=device)
         assert re.match('Cannot use .* because they have different signedness', str(exc_info.value.__cause__))
+    elif op == '%':
+        numpy_expr = f'np.fmod(x, y)'
     else:
         _test_binary(dtype_x, dtype_y, expr, numpy_expr, device=device)
 
