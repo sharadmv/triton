@@ -898,6 +898,7 @@ def _compile(fn, signature: str, device: int = -1, constants=dict(),
     backend = _triton.runtime.backend.CUDA
     if extern_libs is None:
         extern_libs = dict()
+    module.print()
     name, asm, shared_mem = _triton.code_gen.compile_ttir(backend, module, device, num_warps, num_stages, extern_libs, cc)
     return asm, shared_mem, name
 

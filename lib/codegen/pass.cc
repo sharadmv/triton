@@ -9,6 +9,7 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Transforms/IPO.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
+#include "llvm/Pass.h"
 #include "triton/codegen/analysis/align.h"
 #include "triton/codegen/analysis/allocation.h"
 #include "triton/codegen/analysis/axes.h"
@@ -51,6 +52,7 @@ static void link_extern_libs(const ExternLibMap& user_extern_lib_map,
   for (auto& func : ir.get_function_list()) {
     function_names.insert(func->get_name());
   }
+  llvm->print(llvm::errs(), nullptr);
   llvm::legacy::PassManager pass;
   pass.add(llvm::createInternalizePass([&](const llvm::GlobalValue& v) -> bool {
     if (function_names.count(v.getName()) != 0) {
@@ -147,6 +149,7 @@ std::unique_ptr<llvm::Module> add_passes_to_emit_bin(
   barriers.run(ir);
   // exit(1);
   // ir.print(std::cout);
+  ir::print(std::cout);
   isel.visit(ir, *llvm);
   shared_static = allocation.allocated_size();
 
