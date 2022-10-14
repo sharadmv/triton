@@ -1,4 +1,4 @@
-import torch
+# import torch
 
 import triton
 import triton.language as tl
@@ -221,19 +221,19 @@ class _softmax(torch.autograd.Function):
                 )
 
 
-class softmax:
-    def __init__(self, layout, block, device, is_dense=False):
-        self.spdims = layout.shape
-        self.layout = layout
-        self.block = block
-        self.lut, self.maxlut = _softmax.make_lut(self.layout, self.block, device)
-        self.is_dense = is_dense
+# class softmax:
+#     def __init__(self, layout, block, device, is_dense=False):
+#         self.spdims = layout.shape
+#         self.layout = layout
+#         self.block = block
+#         self.lut, self.maxlut = _softmax.make_lut(self.layout, self.block, device)
+#         self.is_dense = is_dense
 
-    def __call__(self, a, *, scale=1.0, rel_logits=None, is_causal=False):
-        if rel_logits is not None and rel_logits.dtype != a.dtype:
-            raise ValueError("relative position embedding must be %s" % a.dtype)
-        a = _softmax.apply(
-            a, scale, rel_logits, is_causal,
-            self.spdims, self.block, self.lut, self.maxlut, self.is_dense,
-        )
-        return a
+#     def __call__(self, a, *, scale=1.0, rel_logits=None, is_causal=False):
+#         if rel_logits is not None and rel_logits.dtype != a.dtype:
+#             raise ValueError("relative position embedding must be %s" % a.dtype)
+#         a = _softmax.apply(
+#             a, scale, rel_logits, is_causal,
+#             self.spdims, self.block, self.lut, self.maxlut, self.is_dense,
+#         )
+#         return a

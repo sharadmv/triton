@@ -4,7 +4,7 @@ __version__ = '2.0.0'
 
 # TODO: torch needs to be imported first
 # or pybind11 shows `munmap_chunk(): invalid pointer`
-import torch
+# import torch
 # submodules
 from .utils import *
 from .runtime import Config, autotune, heuristics, JITFunction, KernelInterface

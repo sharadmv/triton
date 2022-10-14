@@ -8,8 +8,7 @@ import os
 import subprocess
 import textwrap
 from collections import defaultdict, namedtuple
-
-import torch
+# import torch
 
 import triton
 from triton.utils import MockTensor
@@ -281,7 +280,7 @@ def {self.fn.__name__}({', '.join(self.arg_names)}, grid, num_warps=4, num_stage
 """
         scope = {"version_key": version_key(), "get_cuda_stream": get_cuda_stream,
                  "self": self, "_spec_of": self._spec_of, "_key_of": self._key_of,
-                 "cache": self.cache, "triton": triton, "torch": torch}
+                 "cache": self.cache, "triton": triton}
         exec(src, scope)
         return scope[self.fn.__name__]
 

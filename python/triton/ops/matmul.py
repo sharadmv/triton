@@ -1,4 +1,4 @@
-import torch
+# import torch
 
 import triton
 import triton.language as tl
@@ -112,39 +112,39 @@ def _kernel(A, B, C, M, N, K,
         tl.atomic_add(C, acc, mask=mask)
 
 
-class _matmul(torch.autograd.Function):
-    kernel = _kernel
+# class _matmul(torch.autograd.Function):
+#     kernel = _kernel
 
-    _locks = dict()
+#     _locks = dict()
 
-    @staticmethod
-    def _call(a, b):
-        device = a.device
-        # handle non-contiguous inputs if necessary
-        if a.stride(0) > 1 and a.stride(1) > 1:
-            a = a.contiguous()
-        if b.stride(0) > 1 and b.stride(1) > 1:
-            b = b.contiguous()
-        # checks constraints
-        assert a.shape[1] == b.shape[0], "incompatible dimensions"
-        M, K = a.shape
-        _, N = b.shape
-        # allocates output
-        c = torch.empty((M, N), device=device, dtype=a.dtype)
-        # accumulator types
-        ACC_TYPE = tl.float32 if a.dtype in [torch.float16, torch.bfloat16, torch.float32] else tl.int32
-        # launch kernel
-        grid = lambda META: (triton.cdiv(M, META['BLOCK_M']) * triton.cdiv(N, META['BLOCK_N']), META['SPLIT_K'])
-        _kernel[grid](a, b, c, M, N, K,
-                      a.stride(0), a.stride(1),
-                      b.stride(0), b.stride(1),
-                      c.stride(0), c.stride(1),
-                      GROUP_M=8, ACC_TYPE=ACC_TYPE)
-        return c
+#     @staticmethod
+#     def _call(a, b):
+#         device = a.device
+#         # handle non-contiguous inputs if necessary
+#         if a.stride(0) > 1 and a.stride(1) > 1:
+#             a = a.contiguous()
+#         if b.stride(0) > 1 and b.stride(1) > 1:
+#             b = b.contiguous()
+#         # checks constraints
+#         assert a.shape[1] == b.shape[0], "incompatible dimensions"
+#         M, K = a.shape
+#         _, N = b.shape
+#         # allocates output
+#         c = torch.empty((M, N), device=device, dtype=a.dtype)
+#         # accumulator types
+#         ACC_TYPE = tl.float32 if a.dtype in [torch.float16, torch.bfloat16, torch.float32] else tl.int32
+#         # launch kernel
+#         grid = lambda META: (triton.cdiv(M, META['BLOCK_M']) * triton.cdiv(N, META['BLOCK_N']), META['SPLIT_K'])
+#         _kernel[grid](a, b, c, M, N, K,
+#                       a.stride(0), a.stride(1),
+#                       b.stride(0), b.stride(1),
+#                       c.stride(0), c.stride(1),
+#                       GROUP_M=8, ACC_TYPE=ACC_TYPE)
+#         return c
 
-    @staticmethod
-    def forward(ctx, a, b):
-        return _matmul._call(a, b)
+#     @staticmethod
+#     def forward(ctx, a, b):
+#         return _matmul._call(a, b)
 
 
-matmul = _matmul.apply
+# matmul = _matmul.apply

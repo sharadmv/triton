@@ -17,7 +17,7 @@ from sysconfig import get_paths
 from typing import Any, Dict, Set, Tuple, Union
 
 import setuptools
-import torch
+# import torch
 from filelock import FileLock
 
 import triton
@@ -894,7 +894,7 @@ def _compile(fn, signature: str, device: int = -1, constants=dict(),
         return module
 
     assert output == "cubin"
-    assert torch.version.hip is None
+    # assert torch.version.hip is None
     backend = _triton.runtime.backend.CUDA
     if extern_libs is None:
         extern_libs = dict()
