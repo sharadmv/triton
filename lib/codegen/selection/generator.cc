@@ -341,7 +341,7 @@ void generator::visit_launch_inst(ir::launch_inst *launch) {
   builder_->CreateStore(builder_->getInt32(1), builder_->CreateGEP(builder_->getInt32Ty(), block, {_0, _2}));
   Function* called_fn = fns_[fn];
   Value* callee = ConstantExpr::getCast(Instruction::BitCast, called_fn, get_param_arg_tys[0]);
-  Value* arg_ptr = builder_->CreateCall(get_param_buffer, {callee, builder_->CreateLoad(builder_->getInt32PtrTy(), grid), builder_->CreateLoad(builder_->getInt32PtrTy(), block), builder_->getInt32(0)});
+  Value* arg_ptr = builder_->CreateCall(get_param_buffer, {callee, builder_->CreateLoad(builder_->getInt8PtrTy(), grid), builder_->CreateLoad(builder_->getInt8PtrTy(), block), builder_->getInt32(0)});
   // forwrd-declare cudaLaunchDeviceV2
   std::vector<Type*> launch_device_arg_tys = {get_param_ty->getReturnType(), builder_->getInt64Ty()};
   FunctionType* launch_device_ty = FunctionType::get(builder_->getInt32Ty(), launch_device_arg_tys, false);
@@ -364,7 +364,7 @@ void generator::visit_launch_inst(ir::launch_inst *launch) {
     unsigned size = curr_arg_ty->isPointerTy() ? 8 : curr_arg_ty->getPrimitiveSizeInBits() / 8;
     off = (off + size - 1) / size * size;
     // get pointer to current arg
-    Value* curr_arg_ptr = builder_->CreateGEP(arg_ptr->getType()->getScalarType()->getPointerElementType(), arg_ptr, builder_->getInt32(off));
+    Value* curr_arg_ptr = builder_->CreateGEP(builder_->getInt8PtrTy(), arg_ptr, builder_->getInt32(off));
     curr_arg_ptr = builder_->CreateBitCast(curr_arg_ptr, curr_arg_ty->getPointerTo(addr_space));
     // store arg
     builder_->CreateStore(curr_arg, curr_arg_ptr);

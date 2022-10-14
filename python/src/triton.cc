@@ -448,6 +448,7 @@ void init_triton_codegen(py::module &&m) {
             name = ir.get_function_list()[0]->get_name();
             ir.print(ttir);
             llvm::LLVMContext ctx;
+            ctx.setOpaquePointers(false);
             // construct extern lib map
             triton::codegen::ExternLibMap extern_lib_map;
             for (auto item : extern_libs) {

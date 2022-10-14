@@ -149,7 +149,6 @@ std::unique_ptr<llvm::Module> add_passes_to_emit_bin(
   barriers.run(ir);
   // exit(1);
   // ir.print(std::cout);
-  ir::print(std::cout);
   isel.visit(ir, *llvm);
   shared_static = allocation.allocated_size();
 
