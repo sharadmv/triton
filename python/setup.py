@@ -30,12 +30,7 @@ def get_build_type():
 
 
 def use_system_llvm():
-    if platform.system() == "Windows":
-        return True
-    versions = ['-11.0', '-11', '-11-64']
-    supported = ['llvm-config{v}'.format(v=v) for v in versions]
-    paths = [distutils.spawn.find_executable(cfg) for cfg in supported]
-    return any(p is not None for p in paths)
+    return False
 
 
 def get_thirdparty_packages(triton_cache_path):
@@ -50,7 +45,7 @@ def get_thirdparty_packages(triton_cache_path):
     packages = [
         Package("pybind11", "pybind11-2.10.0", "https://github.com/pybind/pybind11/archive/refs/tags/v2.10.0.tar.gz", "include/pybind11/pybind11.h", "PYBIND11_INCLUDE_DIR", "")
     ]
-    if use_system_llvm():
+    if not use_system_llvm():
         # donwload LLVM if no suitable system LLVM is installed
         packages.append(
             Package("llvm", "clang+llvm-15.0.2-x86_64-unknown-linux-gnu/", "https://github.com/llvm/llvm-project/releases/download/llvmorg-15.0.2/clang+llvm-15.0.2-x86_64-unknown-linux-gnu-rhel86.tar.xz", "lib", "LLVM_INCLUDE_DIRS", "LLVM_LIBRARY_DIR")

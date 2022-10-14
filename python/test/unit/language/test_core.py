@@ -222,6 +222,7 @@ def _mod_operation_ill_conditioned(dtype_x, dtype_y) -> bool:
     # remainders than stock LLVM. We currently don't expect to match it
     # bit-for-bit.
     return (dtype_x, dtype_y) in [
+        ('int16', 'bfloat16'),
         ('int32', 'bfloat16'),
         ('int32', 'float16'),
         ('int32', 'float32'),
@@ -257,11 +258,15 @@ def test_bin_op(dtype_x, dtype_y, op, device='cuda'):
     if op == '%' and dtype_x in int_dtypes + uint_dtypes and dtype_y in int_dtypes + uint_dtypes:
         # LLVM has 'numpy.fmod', not 'numpy.remainder', semantics on integer remainders.
         numpy_expr = 'np.fmod(x, y)'
-    elif op in ('/', '%') and dtype_x in ('int16', 'float16', 'bfloat16') and dtype_y in ('int16', 'float16', 'bfloat16'):
+    elif op == '/' and dtype_x in ('int16', 'float16', 'bfloat16') and dtype_y in ('int16', 'float16', 'bfloat16'):
         # Triton promotes 16-bit floating-point / and % to 32-bit because there
         # are no native div or FRem operations on float16. Since we have to
         # convert anyway, we may as well take the accuracy bump.
         numpy_expr = f'x.astype(np.float32) {op} y.astype(np.float32)'
+    elif op == '%' and dtype_x in ('int16', 'float16', 'bfloat16') and dtype_y in ('int16', 'float16', 'bfloat16'):
+        numpy_expr = f'np.fmod(x.astype(np.float32), y.astype(np.float32))'
+    elif op == '%':
+        numpy_expr = f'np.fmod(x, y)'
     elif (dtype_x in uint_dtypes and dtype_y in int_dtypes and _bitwidth(dtype_x) >= _bitwidth(dtype_y)):
         numpy_expr = f'x.astype(np.{dtype_x}) {op} y.astype(np.{dtype_x})'
     elif (dtype_y in uint_dtypes and dtype_x in int_dtypes and _bitwidth(dtype_y) >= _bitwidth(dtype_x)):
