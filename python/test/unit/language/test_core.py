@@ -649,7 +649,7 @@ def test_atomic_rmw(op, dtype_x_str, mode, device='cuda'):
     if exact:
         assert z_ref.item() == to_numpy(z_tri).item()
     else:
-        np.testing.assert_allclose(z_ref, to_numpy(z_tri), rtol=0.01)
+        np.testing.assert_allclose(z_ref, to_numpy(z_tri), rtol=0.03)
 
 
 @pytest.mark.parametrize("axis", [0, 1])
